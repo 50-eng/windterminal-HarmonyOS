@@ -1,0 +1,11 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/logingPage",
+    "practice/Page2",
+    "practice/Page1",
+    "pages/people_center",
+    "pages/zhuyemian",
+    "pages/ai"
+  ]
+}
