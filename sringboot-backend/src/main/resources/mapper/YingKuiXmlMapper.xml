@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace对应Mapper接口的全限定名 -->
+<mapper namespace="com.example.springbootwind.mapper.YingKuiXmlMapper">
+
+    <!-- 定义结果集映射（可选，因为开启了下划线转驼峰，可省略） -->
+    <resultMap id="YingKuiResultMap" type="com.example.springbootwind.demand.YingKui">
+        <id column="id" property="id"/>
+        <result column="stock_name" property="stockName"/>
+        <result column="stock_code" property="stockCode"/>
+        <result column="today_profit_loss" property="todayProfitLoss"/>
+        <result column="total_market_value" property="totalMarketValue"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="current_price" property="currentPrice"/>
+        <result column="today_price_change" property="todayPriceChange"/>
+        <result column="hold_quantity" property="holdQuantity"/>
+    </resultMap>
+
+    <!-- 查询所有数据，对应Mapper接口的selectAllYingKui方法 -->
+    <select id="selectAllYingKui" resultMap="YingKuiResultMap">
+        SELECT
+            id, stock_name, stock_code, today_profit_loss,
+            total_market_value, cost_price, current_price,
+            today_price_change, hold_quantity
+        FROM yingkui
+        ORDER BY id ASC  -- 按主键升序排列，可选
+    </select>
+
+    <select id="selectYingKuiBycondition" parameterType="com.example.springbootwind.demand.YingKui" resultMap="YingKuiResultMap">
+        SELECT
+        id, stock_name, stock_code, today_profit_loss,
+        total_market_value, cost_price, current_price,
+        today_price_change, hold_quantity
+        FROM yingkui
+        <!-- 使用trim标签处理条件前缀，比where标签更灵活 -->
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            <!-- 股票名称模糊匹配：非空时生效 -->
+            <if test="stockName != null and stockName != ''">
+                stock_name LIKE CONCAT('%', #{stockName}, '%')
+            </if>
+            <!-- 股票代码模糊匹配：非空时，添加AND前缀（确保和名称条件是AND关系） -->
+            <if test="stockCode != null and stockCode != ''">
+                AND stock_code LIKE CONCAT('%', #{stockCode}, '%')
+            </if>
+        </trim>
+        ORDER BY id ASC
+    </select>
+
+
+    <!-- 删除语句：对应接口deleteByStockNameAndCode(实体类参数) -->
+    <delete id="deleteByStockNameAndCode" parameterType="com.example.springbootwind.demand.YingKui">
+        DELETE FROM yingkui <!-- 替换为你的实际数据库表名 -->
+        WHERE stock_name = #{stockName} <!-- 数据库字段名（驼峰转换需开启） -->
+        AND stock_code = #{stockCode}
+    </delete>
+
+    <!-- 插入语句1：全字段插入（id自增，不传入） -->
+    <insert id="insertYingKui" parameterType="com.example.springbootwind.demand.YingKui"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        <!-- useGeneratedKeys：开启自增主键返回；keyProperty：实体类的主键字段；keyColumn：数据库的主键列 -->
+        INSERT INTO yingkui (
+        stock_name, stock_code, today_profit_loss, total_market_value,
+        cost_price, current_price, today_price_change, hold_quantity
+        ) VALUES (
+        #{stockName}, #{stockCode}, #{todayProfitLoss}, #{totalMarketValue},
+        #{costPrice}, #{currentPrice}, #{todayPriceChange}, #{holdQuantity}
+        )
+    </insert>
+
+    <!-- 查询语句1：对应接口selectByStockNameAndCode(实体类参数) -->
+    <select id="selectByStockNameAndCode" parameterType="com.example.springbootwind.demand.YingKui" resultMap="YingKuiResultMap">
+        SELECT id, stock_name, stock_code, today_profit_loss, total_market_value,
+        cost_price, current_price, today_price_change, hold_quantity
+        FROM yingkui <!-- 替换为你的实际数据库表名 -->
+        WHERE stock_name = #{stockName}
+        AND stock_code = #{stockCode}
+    </select>
+
+    <!-- 2. 更新holdQuantity的SQL：参数为实体类YingKui，引用其holdQuantity、stockName、stockCode属性 -->
+    <update id="updateHoldQuantityByStockNameAndCode" parameterType="com.example.springbootwind.demand.YingKui">
+        UPDATE yingkui
+        SET hold_quantity = #{holdQuantity}
+        WHERE stock_name = #{stockName}
+          AND stock_code = #{stockCode}
+    </update>
+
+</mapper>

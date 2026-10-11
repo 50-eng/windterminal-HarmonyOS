@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace必须与Mapper接口的全类名一致 -->
+<mapper namespace="com.example.springbootwind.mapper.HangQingXmlMapper">
+
+    <!-- 结果集映射：匹配数据库下划线字段与实体类驼峰属性 -->
+    <resultMap id="HangQingResultMap" type="com.example.springbootwind.demand.HangQing">
+        <!-- 主键映射 -->
+        <id column="id" property="id"/>
+        <!-- 普通字段映射 -->
+        <result column="stock_name" property="stockName"/>
+        <result column="stock_code" property="stockCode"/>
+        <result column="current_price" property="currentPrice"/>
+        <result column="price_change_rate" property="priceChangeRate"/>
+        <result column="turnover_rate" property="turnoverRate"/>
+        <result column="price_change" property="priceChange"/>
+        <result column="five_day_change_rate" property="fiveDayChangeRate"/>
+        <result column="year_to_date_change" property="yearToDateChange"/>
+        <result column="buy_one_price" property="buyOnePrice"/>
+    </resultMap>
+
+    <!-- 精准查询：根据stockName和stockCode查询单条记录 -->
+    <select id="selectByStockNameAndCode" parameterType="com.example.springbootwind.demand.HangQing" resultMap="HangQingResultMap">
+        SELECT id,
+               stock_name,
+               stock_code,
+               current_price,
+               price_change_rate,
+               turnover_rate,
+               price_change,
+               five_day_change_rate,
+               year_to_date_change,
+               buy_one_price
+        FROM hangqing
+        WHERE stock_name = #{stockName}
+          AND stock_code = #{stockCode}
+    </select>
+
+    <select id="finall" parameterType="com.example.springbootwind.demand.HangQing" resultMap="HangQingResultMap">
+        SELECT *
+        FROM hangqing
+    </select>
+
+</mapper>

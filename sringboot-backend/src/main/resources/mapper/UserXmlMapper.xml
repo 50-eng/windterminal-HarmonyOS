@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springbootwind.mapper.UserXmlMapper">
+    <select id="findall" resultType="com.example.springbootwind.demand.User">
+        select * from user
+    </select>
+
+
+    <!-- 显式配置结果映射：column=数据库字段，property=实体类属性 -->
+    <resultMap id="UserResultMap" type="com.example.springbootwind.demand.User">
+        <id column="id" property="id"/> <!-- 主键映射，必须指定id标签 -->
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+    </resultMap>
+
+    <!-- 动态查询：参数不为空时才作为条件 -->
+    <select id="selectUserByCondition" parameterType="com.example.springbootwind.demand.User" resultMap="UserResultMap">
+        SELECT id, username, password
+        FROM user
+        <!-- where标签：自动去除条件前多余的AND/OR，避免WHERE AND语法错误 -->
+        <where>
+            <!-- id：数值类型，精确匹配 -->
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <!-- username：字符串类型，精确匹配（添加=运算符，核心修复点） -->
+            <if test="username != null and username != ''">
+                AND username = #{username}
+            </if>
+            <!-- password：字符串类型，精确匹配（添加=运算符，核心修复点） -->
+            <if test="password != null and password != ''">
+                AND password = #{password}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.springbootwind.demand.User"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `User` (username, password)
+        VALUES (#{username}, #{password})
+    </insert>
+
+</mapper>
